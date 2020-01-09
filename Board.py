@@ -7,6 +7,7 @@ class Board:
         self.isPieceSelected = False
         self.board = []
         self.initUI()
+        self.lastClicked =()
 
     def uncheckall(self):
         for i in range(0, 8):
@@ -23,6 +24,19 @@ class Board:
                 break
         self.uncheckall()
         print("Wcisniety przycisk:", chr(ord('A') + tempint[0]), tempint[1])
+        if self.lastClicked == (tempint[0], tempint[1]):
+            self.lastClicked = ()
+            print("odklikales przycisk")
+        elif self.lastClicked != ():
+            print("ruch z ", chr(ord('A') + self.lastClicked[0]), self.lastClicked[1] ," na ", chr(ord('A') + tempint[0]), tempint[1])
+            # todo wywołanie updateBorad()
+            self.lastClicked = ()
+        else:
+
+            self.lastClicked = (tempint[0], tempint[1])
+
+    def updateBoard(self, x ,y ,newx,newy):
+
 
     def initUI(self):
         self.mainwidget = QWidget()
