@@ -1,6 +1,7 @@
 import pickle
 import socket
 import sys
+import pymsgbox
 from _thread import start_new_thread
 
 from PyQt5.QtWidgets import QApplication
@@ -46,7 +47,9 @@ def threaded_client(conn, b):  # obsługa klienta
     conn.close()
 
 print("przed akceptacja")
+pymsgbox.alert('Waiting for opponent to connect', 'Be patient...')
 conn, addr = s.accept()  # conn to jest ponoc to polaczenie cos ala socket w javie bo przez niego sie przesyla
+
 print("connected to: ", addr)
 app = QApplication(sys.argv)
 b = Board()
