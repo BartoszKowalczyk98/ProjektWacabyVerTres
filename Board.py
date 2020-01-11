@@ -31,17 +31,30 @@ class Board:
         self.checkMove(tempint)
 
     def checkMove(self, tempint):
+
         if self.lastclicked == tempint:  # odklikanie
             print("odklikanie")
             self.lastclicked = ()
-        elif self.lastclicked != ():
+        elif self.lastclicked != ():  # ruch
+            if abs(self.lastclicked[1] - tempint[1]) != 1:#no chyba że bicie
+                return
+            elif self.goodbuttons[
+                self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind() == RodzajPionka.bialyzwykly:  # jest bialy
+                if self.lastclicked[0] - tempint[0] != -1:
+                    return
+            elif self.goodbuttons[
+                self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind() == RodzajPionka.czarnyzwykly:
+                if self.lastclicked[0] - tempint[0] != 1:
+                    return
+            if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() != RodzajPionka.pusty:
+                return
             print("ruch z : ", self.lastclicked, " na ", tempint)
             self.boardAsArray[tempint[0] * 8 + tempint[1] - 1] = self.goodbuttons[
                 self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind()
             self.boardAsArray[self.lastclicked[0] * 8 + self.lastclicked[1] - 1] = RodzajPionka.pusty
             self.lastclicked = ()
             self.updateboard(self.boardAsArray)
-        else:
+        else:  # zaznaczenie co chcemy przesunąć
             if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.pusty:
                 self.lastclicked = ()
             else:
