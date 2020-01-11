@@ -49,11 +49,11 @@ class Board:
             if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() != RodzajPionka.pusty:
                 return
             print("ruch z : ", self.lastclicked, " na ", tempint)
-            self.boardAsArray[tempint[0] * 8 + tempint[1] - 1] = self.goodbuttons[
-                self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind()
-            self.boardAsArray[self.lastclicked[0] * 8 + self.lastclicked[1] - 1] = RodzajPionka.pusty
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind( self.goodbuttons[
+                self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind())
+            self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setKind( RodzajPionka.pusty)
             self.lastclicked = ()
-            self.updateboard(self.boardAsArray)
+            self.updateboard(self.goodbuttons)
         else:  # zaznaczenie co chcemy przesunąć
             if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.pusty:
                 self.lastclicked = ()
@@ -61,27 +61,22 @@ class Board:
                 print("kliknieto: ", tempint)
                 self.lastclicked = tempint
 
-    def updateboard(self, tablica):
+    def updateboard(self, tablica):#tylko do rysowania na ekranie
         counter = 0
         if len(tablica) != 64:
             print("Tablica jest nie teges")
         else:
             for i in tablica:
-                if (i == RodzajPionka.pusty):
+                if (i.getKind() == RodzajPionka.pusty):
                     self.goodbuttons[counter].setStyleSheet("background-color: gray")
-                    self.goodbuttons[counter].setKind(RodzajPionka.pusty)
-                elif (i == RodzajPionka.bialyzwykly):
+                elif (i.getKind() == RodzajPionka.bialyzwykly):
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/białyzwykły50.jpg)")
-                    self.goodbuttons[counter].setKind(RodzajPionka.bialyzwykly)
-                elif (i == RodzajPionka.czarnyzwykly):
+                elif (i.getKind() == RodzajPionka.czarnyzwykly):
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/czarnyzwykły50.jpg)")
-                    self.goodbuttons[counter].setKind(RodzajPionka.czarnyzwykly)
-                elif (i == RodzajPionka.bialydama):
+                elif (i.getKind() == RodzajPionka.bialydama):
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/białadama50.jpg)")
-                    self.goodbuttons[counter].setKind(RodzajPionka.bialydama)
-                elif (i == RodzajPionka.czarnydama):
+                elif (i.getKind() == RodzajPionka.czarnydama):
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/czarnadama50.jpg)")
-                    self.goodbuttons[counter].setKind(RodzajPionka.czarnydama)
                 counter = counter + 1
 
     def initUI(self):
@@ -92,7 +87,6 @@ class Board:
         self.mainwidget.setLayout(self.grid)
         self.grupy = []
         self.goodbuttons = []
-        self.boardAsArray = []
         for i in range(0, 8):
             self.grupy.append(QButtonGroup())
             self.grupy[i].setExclusive(True)
@@ -103,21 +97,18 @@ class Board:
                 if ((i + j) % 2 == 1 and i >= 0 and i < 3):
                     button.setStyleSheet("background-image: url(assets/białyzwykły50.jpg)")
                     button.setKind(RodzajPionka.bialyzwykly)
-                    self.boardAsArray.append(RodzajPionka.bialyzwykly)
                     self.goodbuttons.append(button)
                 elif ((i + j) % 2 == 1 and i >= 5 and i < 9):
                     button.setStyleSheet("background-image: url(assets/czarnyzwykły50.jpg)")
                     button.setKind(RodzajPionka.czarnyzwykly)
-                    self.boardAsArray.append(RodzajPionka.czarnyzwykly)
                     self.goodbuttons.append(button)
                 elif ((i + j) % 2 == 1):
                     button.setStyleSheet("background-color: gray")
-                    self.boardAsArray.append(RodzajPionka.pusty)
                     self.goodbuttons.append(button)
                 else:
                     button.setStyleSheet("background-color: white")
                     button.setEnabled(False)
-                    self.boardAsArray.append(RodzajPionka.zablokowany)
+                    button.setKind(RodzajPionka.zablokowany)
                     self.goodbuttons.append(button)
 
                 button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
