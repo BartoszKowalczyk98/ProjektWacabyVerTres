@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from MyPushButton import MyPushButton
 from MyEnum import RodzajPionka
 
+
 class Board:
     def __init__(self):
         super(Board, self).__init__()
@@ -14,17 +15,16 @@ class Board:
         self.initUI()
 
     def uncheckall(self):
-        for i in range (0,8):
+        for i in range(0, 8):
             self.grupy[i].setExclusive(False)
-            for j in range(1,9):
+            for j in range(1, 9):
                 self.grupy[i].button(j).setChecked(False)
             self.grupy[i].setExclusive(True)
 
-
     def buttonpressed(self):
-        for i in range (0,8):
+        for i in range(0, 8):
             self.tempbutton = self.grupy[i].checkedButton()
-            tempint = (i,self.grupy[i].checkedId())
+            tempint = (i, self.grupy[i].checkedId())
             if self.tempbutton is not None:
                 break
         self.uncheckall()
@@ -42,8 +42,11 @@ class Board:
             self.lastclicked = ()
             self.updateboard(self.boardAsArray)
         else:
-            print("kliknieto: ", tempint)
-            self.lastclicked = tempint
+            if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.pusty:
+                self.lastclicked = ()
+            else:
+                print("kliknieto: ", tempint)
+                self.lastclicked = tempint
 
     def updateboard(self, tablica):
         counter = 0
@@ -70,21 +73,21 @@ class Board:
 
     def initUI(self):
         self.mainwidget = QWidget()
-        self.mainwidget.setFixedSize(600,600)
+        self.mainwidget.setFixedSize(600, 600)
         self.grid = QGridLayout()
         self.grid.setSpacing(0)
         self.mainwidget.setLayout(self.grid)
         self.grupy = []
         self.goodbuttons = []
         self.boardAsArray = []
-        for i in range (0,8):
+        for i in range(0, 8):
             self.grupy.append(QButtonGroup())
             self.grupy[i].setExclusive(True)
-        for i in range(0,8):
-            for j in range(0,8):
-                button = MyPushButton(0)
+        for i in range(0, 8):
+            for j in range(0, 8):
+                button = MyPushButton(RodzajPionka.pusty)
                 button.setCheckable(True)
-                if ((i+j)%2 == 1 and i >= 0 and i < 3):
+                if ((i + j) % 2 == 1 and i >= 0 and i < 3):
                     button.setStyleSheet("background-image: url(assets/białyzwykły50.jpg)")
                     button.setKind(RodzajPionka.bialyzwykly)
                     self.boardAsArray.append(RodzajPionka.bialyzwykly)
@@ -105,10 +108,9 @@ class Board:
                     self.goodbuttons.append(button)
 
                 button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                self.grupy[i].addButton(button, j+1)
+                self.grupy[i].addButton(button, j + 1)
                 self.grid.addWidget(button, i, j)
 
-        #print(self.grupy[1].button(1).getKind())
         self.mainwidget.show()
 
         self.grupy[0].buttonClicked.connect(self.buttonpressed)
