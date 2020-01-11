@@ -10,6 +10,7 @@ class Board:
         self.isPieceSelected = False
         self.board = []
         self.tempbutton = None
+        self.lastclicked = ()
         self.initUI()
 
     def uncheckall(self):
@@ -27,16 +28,23 @@ class Board:
             if self.tempbutton is not None:
                 break
         self.uncheckall()
-        print(self.tempbutton.getKind(), " koordynaty: ",tempint)
-        #print("Wcisniety przycisk:", chr(ord('A') + tempint[0]), tempint[1])
-        print(self.boardAsArray)
-        self.boardAsArray[tempint[0]+tempint[1]-1] = RodzajPionka.pusty
-        self.updateboard(self.boardAsArray)
-        #self.updateboard([0,1,2,0,0,0,1,2,2,1,0,0,0,0,1,2,0,0,0,1,0,2,1,2,2,0,1,1,1,0,3,4])
+        #print(self.tempbutton.getKind(), " koordynaty: ",tempint)
+        if self.lastclicked == tempint:#odklikanie
+            print("odklikanie")
+            self.lastclicked =()
+        elif self.lastclicked != ():
+            print("ruch z : ",self.lastclicked," na ",tempint)
+            self.boardAsArray[tempint[0] * 8 + tempint[1] - 1] = self.goodbuttons[self.lastclicked[0]*8+self.lastclicked[1]-1].getKind()
+            self.boardAsArray[self.lastclicked[0]*8+self.lastclicked[1]-1] = RodzajPionka.pusty
+            self.lastclicked = ()
+            self.updateboard(self.boardAsArray)
+        else:
+            print("kliknieto: ", tempint)
+            self.lastclicked = tempint
 
     def updateboard(self, tablica):
         counter = 0
-        if len(tablica) != 32:
+        if len(tablica) != 64:
             print("Tablica jest nie teges")
         else:
             for i in tablica:
@@ -85,6 +93,9 @@ class Board:
                 else:
                     button.setStyleSheet("background-color: white")
                     button.setEnabled(False)
+                    self.boardAsArray.append(RodzajPionka.zablokowany)
+                    self.goodbuttons.append(button)
+
                 button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 self.grupy[i].addButton(button, j+1)
                 self.grid.addWidget(button, i, j)

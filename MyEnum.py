@@ -5,5 +5,6 @@ class RodzajPionka(Enum):
     pusty = 2
     czarnyzwykly =3
     czarnydama = 4
+    zablokowany = 5
 
 
