@@ -140,7 +140,8 @@ class Board(QMainWindow):
                 self.grupy[i].addButton(button, j + 1)
                 self.grid.addWidget(button, i, j)
 
-        self.mainwidget.show()
+        self.setCentralWidget(self.mainwidget)
+        self.show()
 
         self.grupy[0].buttonClicked.connect(self.buttonpressed)
         self.grupy[1].buttonClicked.connect(self.buttonpressed)
