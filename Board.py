@@ -25,7 +25,6 @@ class Board(QMainWindow):
             self.grupy[i].setExclusive(True)
 
     def buttonpressed(self):
-        # print("Czy bicie jest dostepne?", self.isBeatingPossible("Gracz1"))
         for i in range(0, 8):
             self.tempbutton = self.grupy[i].checkedButton()
             tempint = (i, self.grupy[i].checkedId())
@@ -37,32 +36,39 @@ class Board(QMainWindow):
 
     def isBeatingPossible(self, user):
         self.status.showMessage('Jest możliwość bicia')
+        anythingToBeat = False
         for i in range(0, 8):
             for j in range(0, 8):
                 if self.goodbuttons[i * 8 + j].getOwner() == user:
                     if i - 2 >= 0 and j - 2 >= 0 and self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() != user and \
                             self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[(i - 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
-                        self.goodbuttons[(i - 2) * 8 + j - 2].setStyleSheet("background-color: aqua")
-                        return True
+                        self.tempbutton = self.goodbuttons[(i -1) * 8 + j - 1]
+                        self.changeColor(2)
+                        anythingToBeat = True
                     elif i - 2 >= 0 and j + 2 <= 7 and self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() != user and \
                             self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[(i - 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
-                        self.goodbuttons[(i - 2) * 8 + j + 2].setStyleSheet("background-color: aqua")
-                        return True
+                        self.tempbutton = self.goodbuttons[(i - 1) * 8 + j + 1]
+                        self.changeColor(2)
+                        anythingToBeat = True
                     elif i + 2 <= 7 and j - 2 >= 0 and self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() != user and \
                             self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[(i + 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
-                        self.goodbuttons[(i + 2) * 8 + j - 2].setStyleSheet("background-color: aqua")
-                        return True
+                        self.tempbutton = self.goodbuttons[(i + 1) * 8 + j - 1]
+                        self.changeColor(2)
+                        anythingToBeat = True
                     elif i + 2 <= 7 and j + 2 <= 7 and self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() != user and \
                             self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[(i + 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
-                        self.goodbuttons[(i + 2) * 8 + j + 2].setStyleSheet("background-color: aqua")
-                        return True
-        self.status.showMessage('Normalny ruch')
-        return False
+                        self.tempbutton = self.goodbuttons[(i + 1) * 8 + j + 1]
+                        self.changeColor(2)
+                        anythingToBeat = True
+        if anythingToBeat == False:
+            self.status.showMessage('Normalny ruch')
+        return anythingToBeat
 
     def checkMove(self, tempint):
-        doIHaveToBeat = self.isBeatingPossible(self.playername)  # musi byc nazwa gracza jakąś zmienną
+        doIHaveToBeat = self.isBeatingPossible(self.playername)  # sprawdzanie czy jest bicie
         if self.lastclicked == tempint:  # odklikanie
-            print("odklikanie")
+
+            self.tempbutton = self.goodbuttons[self.lastclicked[0]*8 + self.lastclicked[1]-1]
             self.changeColor(0)
             self.lastclicked = ()
         elif self.lastclicked != ():  # ruch
@@ -71,6 +77,7 @@ class Board(QMainWindow):
             else:
                 completed = self.noBeatingMove(tempint)
             if not completed:
+                self.status.showMessage('Bledny ruch')
                 return
         else:  # zaznaczenie co chcemy przesunąć
             if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.pusty:
@@ -78,7 +85,8 @@ class Board(QMainWindow):
             elif self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getOwner() != self.playername:
                 self.lastclicked = ()
             else:
-                print("kliknieto: ", tempint)
+
+                self.tempbutton = self.goodbuttons[tempint[0] * 8 + tempint[1] - 1]
                 self.changeColor(1)
                 self.lastclicked = tempint
 
@@ -154,6 +162,15 @@ class Board(QMainWindow):
                 self.tempbutton.setStyleSheet("background-image: url(assets/czarnyzwykły50.jpg)")
             elif self.tempbutton.getKind() == RodzajPionka.czarnydama:
                 self.tempbutton.setStyleSheet("background-image: url(assets/czarnadama50.jpg)")
+        elif choice == 2:
+            if self.tempbutton.getKind() == RodzajPionka.bialyzwykly:
+                self.tempbutton.setStyleSheet("background-image: url(assets/beatbiałyzwykły50.jpg)")
+            elif self.tempbutton.getKind() == RodzajPionka.bialydama:
+                self.tempbutton.setStyleSheet("background-image: url(assets/beatbiaładama50.jpg)")
+            elif self.tempbutton.getKind() == RodzajPionka.czarnyzwykly:
+                self.tempbutton.setStyleSheet("background-image: url(assets/beatczarnyzwykły50.jpg)")
+            elif self.tempbutton.getKind() == RodzajPionka.czarnydama:
+                self.tempbutton.setStyleSheet("background-image: url(assets/beatczarnadama50.jpg)")
 
     def updateboard(self, tablica):  # tylko do rysowania na ekranie
         counter = 0
