@@ -31,7 +31,7 @@ class Board(QMainWindow):
             tempint = (i, self.grupy[i].checkedId())
             if self.tempbutton is not None:
                 break
-        print(self.goodbuttons[tempint[0]*8+tempint[1]-1].getOwner())
+
         self.uncheckall()
         self.checkMove(tempint)
 
@@ -60,7 +60,7 @@ class Board(QMainWindow):
         return False
 
     def checkMove(self, tempint):
-        doIHaveToBeat = self.isBeatingPossible("Gracz1")  # musi byc nazwa gracza jakąś zmienną
+        doIHaveToBeat = self.isBeatingPossible(self.playername)  # musi byc nazwa gracza jakąś zmienną
         if self.lastclicked == tempint:  # odklikanie
             print("odklikanie")
             self.lastclicked = ()
@@ -74,13 +74,14 @@ class Board(QMainWindow):
         else:  # zaznaczenie co chcemy przesunąć
             if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.pusty:
                 self.lastclicked = ()
+            elif self.goodbuttons[tempint[0]*8+tempint[1]-1].getOwner() != self.playername:
+                self.lastclicked = ()
             else:
                 print("kliknieto: ", tempint)
                 self.lastclicked = tempint
 
     def beatingMove(self, tempint, owner,opponent):
         wektorPrzeskoku = (tempint[0] - self.lastclicked[0], tempint[1] - self.lastclicked[1])
-        print(wektorPrzeskoku)
         if abs(wektorPrzeskoku[1]) != 2 or abs(wektorPrzeskoku[0]) != 2:
             return False
         if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() != RodzajPionka.pusty:
