@@ -115,10 +115,12 @@ class Board:
                 if ((i + j) % 2 == 1 and i >= 0 and i < 3):
                     button.setStyleSheet("background-image: url(assets/białyzwykły50.jpg)")
                     button.setKind(RodzajPionka.bialyzwykly)
+                    button.setOwner("Gracz1")
                     self.goodbuttons.append(button)
                 elif ((i + j) % 2 == 1 and i >= 5 and i < 9):
                     button.setStyleSheet("background-image: url(assets/czarnyzwykły50.jpg)")
                     button.setKind(RodzajPionka.czarnyzwykly)
+                    button.setOwner("Gracz2")
                     self.goodbuttons.append(button)
                 elif ((i + j) % 2 == 1):
                     button.setStyleSheet("background-color: gray")
