@@ -3,9 +3,10 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 class MyPushButton(QPushButton):
-    def __init__(self, kind, parent = None):
+    def __init__(self, kind, owner = None, parent = None):
         super(MyPushButton,self).__init__(parent)
         self.kind = kind
+        self.owner = owner
 
     def setKind(self, kind):
         self.kind = kind
