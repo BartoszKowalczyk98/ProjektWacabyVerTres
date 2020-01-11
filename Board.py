@@ -31,7 +31,7 @@ class Board(QMainWindow):
             tempint = (i, self.grupy[i].checkedId())
             if self.tempbutton is not None:
                 break
-        self.changeColor(1)
+
         self.uncheckall()
         self.checkMove(tempint)
 
@@ -63,6 +63,7 @@ class Board(QMainWindow):
         doIHaveToBeat = self.isBeatingPossible(self.playername)  # musi byc nazwa gracza jakąś zmienną
         if self.lastclicked == tempint:  # odklikanie
             print("odklikanie")
+            self.changeColor(0)
             self.lastclicked = ()
         elif self.lastclicked != ():  # ruch
             if doIHaveToBeat:
@@ -78,6 +79,7 @@ class Board(QMainWindow):
                 self.lastclicked = ()
             else:
                 print("kliknieto: ", tempint)
+                self.changeColor(1)
                 self.lastclicked = tempint
 
     def beatingMove(self, tempint, owner, opponent):
