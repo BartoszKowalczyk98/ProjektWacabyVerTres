@@ -5,13 +5,14 @@ from MyPushButton import MyPushButton
 from MyEnum import RodzajPionka
 
 
-class Board:
+class Board(QMainWindow):
     def __init__(self):
         super(Board, self).__init__()
         self.isPieceSelected = False
         self.board = []
         self.tempbutton = None
         self.lastclicked = ()
+        self.status = self.statusBar()
         self.initUI()
 
     def uncheckall(self):
@@ -33,6 +34,7 @@ class Board:
 
 
     def isBeatingPossible(self, user):
+        self.status.showMessage('CHUJKURWAKAOSFDKASPFDIOASFPOSDLVKMSPODIFPAESOFKLSPDKOFPSOKDEFPOSEFKSODKFPSDOFPKSPOEF')
         for i in range(0, 8):
             for j in range(0, 8):
                 if self.goodbuttons[i * 8 + j].getOwner() == user:
