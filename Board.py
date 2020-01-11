@@ -12,6 +12,8 @@ class Board(QMainWindow):
         self.board = []
         self.tempbutton = None
         self.lastclicked = ()
+        self.playername ='Gracz1'
+        self.opponent = 'Gracz2'
         self.status = self.statusBar()
         self.initUI()
 
@@ -23,60 +25,52 @@ class Board(QMainWindow):
             self.grupy[i].setExclusive(True)
 
     def buttonpressed(self):
-        print("Czy bicie jest dostepne?", self.isBeatingPossible("Gracz1"))
+        # print("Czy bicie jest dostepne?", self.isBeatingPossible("Gracz1"))
         for i in range(0, 8):
             self.tempbutton = self.grupy[i].checkedButton()
             tempint = (i, self.grupy[i].checkedId())
             if self.tempbutton is not None:
                 break
+        print(self.goodbuttons[tempint[0]*8+tempint[1]-1].getOwner())
         self.uncheckall()
         self.checkMove(tempint)
 
-
     def isBeatingPossible(self, user):
-        self.status.showMessage('CHUJKURWAKAOSFDKASPFDIOASFPOSDLVKMSPODIFPAESOFKLSPDKOFPSOKDEFPOSEFKSODKFPSDOFPKSPOEF')
+        self.status.showMessage('Jest możliwość bicia')
         for i in range(0, 8):
             for j in range(0, 8):
                 if self.goodbuttons[i * 8 + j].getOwner() == user:
                     if i - 2 >= 0 and j - 2 >= 0 and self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() != user and \
-                            self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[(i - 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[
+                        (i - 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
                         return True
                     elif i - 2 >= 0 and j + 2 <= 7 and self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() != user and \
-                            self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[(i - 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[
+                        (i - 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
                         return True
                     elif i + 2 <= 7 and j - 2 >= 0 and self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() != user and \
-                            self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[(i + 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[
+                        (i + 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
                         return True
                     elif i + 2 <= 7 and j + 2 <= 7 and self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() != user and \
-                            self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[(i + 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[
+                        (i + 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
                         return True
+        self.status.showMessage('Normalny ruch')
         return False
-    def checkMove(self, tempint):
 
+    def checkMove(self, tempint):
+        doIHaveToBeat = self.isBeatingPossible("Gracz1")  # musi byc nazwa gracza jakąś zmienną
         if self.lastclicked == tempint:  # odklikanie
             print("odklikanie")
             self.lastclicked = ()
         elif self.lastclicked != ():  # ruch
-            if abs(self.lastclicked[1] - tempint[1]) != 1:#no chyba że bicie
+            if doIHaveToBeat:
+                completed = self.beatingMove(tempint, self.playername,self.opponent)
+            else:
+                completed = self.noBeatingMove(tempint)
+            if not completed:
                 return
-            elif self.goodbuttons[
-                self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind() == RodzajPionka.bialyzwykly:  # jest bialy
-                if self.lastclicked[0] - tempint[0] != -1:
-                    return
-            elif self.goodbuttons[
-                self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind() == RodzajPionka.czarnyzwykly:
-                if self.lastclicked[0] - tempint[0] != 1:
-                    return
-            if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() != RodzajPionka.pusty:
-                return
-            print("ruch z : ", self.lastclicked, " na ", tempint)
-            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind( self.goodbuttons[
-                self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind())
-            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setOwner(self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getOwner())
-            self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setKind( RodzajPionka.pusty)
-            self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setOwner(None)
-            self.lastclicked = ()
-            self.updateboard(self.goodbuttons)
         else:  # zaznaczenie co chcemy przesunąć
             if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.pusty:
                 self.lastclicked = ()
@@ -84,7 +78,61 @@ class Board(QMainWindow):
                 print("kliknieto: ", tempint)
                 self.lastclicked = tempint
 
-    def updateboard(self, tablica):#tylko do rysowania na ekranie
+    def beatingMove(self, tempint, owner,opponent):
+        wektorPrzeskoku = (tempint[0] - self.lastclicked[0], tempint[1] - self.lastclicked[1])
+        print(wektorPrzeskoku)
+        if abs(wektorPrzeskoku[1]) != 2 or abs(wektorPrzeskoku[0]) != 2:
+            return False
+        if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() != RodzajPionka.pusty:
+            return False
+        if self.goodbuttons[(self.lastclicked[0] + int(wektorPrzeskoku[0] / 2)) * 8 + (
+                self.lastclicked[1] + int(wektorPrzeskoku[1] / 2) - 1)].getOwner() != opponent :
+            return False
+        print("ruch z : ", self.lastclicked, " na ", tempint)
+        self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(self.goodbuttons[
+                                                                      self.lastclicked[0] * 8 + self.lastclicked[
+                                                                          1] - 1].getKind())
+        self.goodbuttons[
+            (self.lastclicked[0] + int(wektorPrzeskoku[0] / 2)) * 8 + (
+                        self.lastclicked[1] + int(wektorPrzeskoku[1] / 2) - 1)].setKind(RodzajPionka.pusty)
+        self.goodbuttons[
+            (self.lastclicked[0] + int(wektorPrzeskoku[0] / 2)) * 8 + (
+                        self.lastclicked[1] + int(wektorPrzeskoku[1] / 2) - 1)].setOwner(None)
+        self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setOwner(
+            self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getOwner())
+        self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setKind(RodzajPionka.pusty)
+        self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setOwner(None)
+        self.lastclicked = ()
+        self.updateboard(self.goodbuttons)
+        return True
+
+    def noBeatingMove(self, tempint):
+        wektorPrzeskoku = (self.lastclicked[0] - tempint[0], abs(self.lastclicked[1] - tempint[1]))
+        if wektorPrzeskoku[1] != 1:
+            return False
+        elif self.goodbuttons[
+            self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind() == RodzajPionka.bialyzwykly:  # jest bialy
+            if wektorPrzeskoku[0] != -1:
+                return False
+        elif self.goodbuttons[
+            self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind() == RodzajPionka.czarnyzwykly:
+            if wektorPrzeskoku[0] != 1:
+                return False
+        if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() != RodzajPionka.pusty:
+            return False
+        print("ruch z : ", self.lastclicked, " na ", tempint)
+        self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(self.goodbuttons[
+                                                                      self.lastclicked[0] * 8 + self.lastclicked[
+                                                                          1] - 1].getKind())
+        self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setOwner(
+            self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getOwner())
+        self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setKind(RodzajPionka.pusty)
+        self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setOwner(None)
+        self.lastclicked = ()
+        self.updateboard(self.goodbuttons)
+        return True
+
+    def updateboard(self, tablica):  # tylko do rysowania na ekranie
         counter = 0
         if len(tablica) != 64:
             print("Tablica jest nie teges")
