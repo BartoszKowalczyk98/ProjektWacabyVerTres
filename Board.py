@@ -22,6 +22,7 @@ class Board:
             self.grupy[i].setExclusive(True)
 
     def buttonpressed(self):
+        print("Czy bicie jest dostepne?", self.isBeatingPossible("Gracz1"))
         for i in range(0, 8):
             self.tempbutton = self.grupy[i].checkedButton()
             tempint = (i, self.grupy[i].checkedId())
@@ -29,23 +30,23 @@ class Board:
                 break
         self.uncheckall()
         self.checkMove(tempint)
-        print("Czy bicie jest dostepne?", self.isBeatingPossible("Gracz1"))
+
 
     def isBeatingPossible(self, user):
         for i in range(0, 8):
             for j in range(0, 8):
                 if self.goodbuttons[i * 8 + j].getOwner() == user:
                     if i - 2 >= 0 and j - 2 >= 0 and self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() != user and \
-                            self.goodbuttons[(i - 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[(i - 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
                         return True
                     elif i - 2 >= 0 and j + 2 <= 7 and self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() != user and \
-                            self.goodbuttons[(i - 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[(i - 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
                         return True
                     elif i + 2 <= 7 and j - 2 >= 0 and self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() != user and \
-                            self.goodbuttons[(i + 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[(i + 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
                         return True
                     elif i + 2 <= 7 and j + 2 <= 7 and self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() != user and \
-                            self.goodbuttons[(i + 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[(i + 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
                         return True
         return False
     def checkMove(self, tempint):
@@ -69,7 +70,9 @@ class Board:
             print("ruch z : ", self.lastclicked, " na ", tempint)
             self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind( self.goodbuttons[
                 self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind())
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setOwner(self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getOwner())
             self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setKind( RodzajPionka.pusty)
+            self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setOwner(None)
             self.lastclicked = ()
             self.updateboard(self.goodbuttons)
         else:  # zaznaczenie co chcemy przesunąć
