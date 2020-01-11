@@ -50,14 +50,19 @@ class Board:
             for i in tablica:
                 if (i == RodzajPionka.pusty):
                     self.goodbuttons[counter].setStyleSheet("background-color: gray")
+                    self.goodbuttons[counter].setKind(RodzajPionka.pusty)
                 elif (i == RodzajPionka.bialyzwykly):
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/białyzwykły50.jpg)")
+                    self.goodbuttons[counter].setKind(RodzajPionka.bialyzwykly)
                 elif (i == RodzajPionka.czarnyzwykly):
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/czarnyzwykły50.jpg)")
+                    self.goodbuttons[counter].setKind(RodzajPionka.czarnyzwykly)
                 elif (i == RodzajPionka.bialydama):
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/białadama50.jpg)")
+                    self.goodbuttons[counter].setKind(RodzajPionka.bialydama)
                 elif (i == RodzajPionka.czarnydama):
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/czarnadama50.jpg)")
+                    self.goodbuttons[counter].setKind(RodzajPionka.czarnydama)
                 counter = counter + 1
 
     def initUI(self):
