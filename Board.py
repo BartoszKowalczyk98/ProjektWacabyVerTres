@@ -28,14 +28,17 @@ class Board:
             if self.tempbutton is not None:
                 break
         self.uncheckall()
-        #print(self.tempbutton.getKind(), " koordynaty: ",tempint)
-        if self.lastclicked == tempint:#odklikanie
+        self.checkMove(tempint)
+
+    def checkMove(self, tempint):
+        if self.lastclicked == tempint:  # odklikanie
             print("odklikanie")
-            self.lastclicked =()
+            self.lastclicked = ()
         elif self.lastclicked != ():
-            print("ruch z : ",self.lastclicked," na ",tempint)
-            self.boardAsArray[tempint[0] * 8 + tempint[1] - 1] = self.goodbuttons[self.lastclicked[0]*8+self.lastclicked[1]-1].getKind()
-            self.boardAsArray[self.lastclicked[0]*8+self.lastclicked[1]-1] = RodzajPionka.pusty
+            print("ruch z : ", self.lastclicked, " na ", tempint)
+            self.boardAsArray[tempint[0] * 8 + tempint[1] - 1] = self.goodbuttons[
+                self.lastclicked[0] * 8 + self.lastclicked[1] - 1].getKind()
+            self.boardAsArray[self.lastclicked[0] * 8 + self.lastclicked[1] - 1] = RodzajPionka.pusty
             self.lastclicked = ()
             self.updateboard(self.boardAsArray)
         else:
