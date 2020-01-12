@@ -17,7 +17,7 @@ class Board(QMainWindow):
         self.tempbutton = None
         self.lastclicked = ()
         self.playername = playername
-        self.myTurn = True
+        self.myTurn = False
         self.opponent = opponent
         self.status = self.statusBar()
         self.initUI()
@@ -93,7 +93,7 @@ class Board(QMainWindow):
                 self.status.showMessage('Bledny ruch')
                 return
             else:
-                if doIHaveToBeat== True:
+                if doIHaveToBeat and self.isBeatingPossible(self.playername):
                     self.myTurn = True
                 else:
                     self.myTurn = False
@@ -270,9 +270,9 @@ class Board(QMainWindow):
         for element in received:
             self.goodbuttons[counter].setKind(element)
             if element == RodzajPionka.bialyzwykly or element == RodzajPionka.bialydama:
-                self.goodbuttons[counter].setOwner("host")
-            elif element == RodzajPionka.czarnyzwykly or element == RodzajPionka.czarnydama:
                 self.goodbuttons[counter].setOwner("player")
+            elif element == RodzajPionka.czarnyzwykly or element == RodzajPionka.czarnydama:
+                self.goodbuttons[counter].setOwner("host")
             else:
                 self.goodbuttons[counter].setOwner(None)
             counter = counter + 1
