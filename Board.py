@@ -16,6 +16,7 @@ class Board(QMainWindow):
         self.tempbutton = None
         self.lastclicked = ()
         self.playername = playername
+        self.myTurn = True
         self.opponent = opponent
         self.status = self.statusBar()
         self.initUI()
@@ -28,6 +29,9 @@ class Board(QMainWindow):
             self.grupy[i].setExclusive(True)
 
     def buttonpressed(self):
+        if not self.myTurn:
+            self.uncheckall()
+            return
         for i in range(0, 8):
             self.tempbutton = self.grupy[i].checkedButton()
             tempint = (i, self.grupy[i].checkedId())
@@ -36,6 +40,7 @@ class Board(QMainWindow):
 
         self.uncheckall()
         self.checkMove(tempint)
+
 
     def isBeatingPossible(self, user):
         self.status.showMessage('Jest możliwość bicia')
@@ -86,6 +91,11 @@ class Board(QMainWindow):
             if not completed:
                 self.status.showMessage('Bledny ruch')
                 return
+            else:
+                if doIHaveToBeat== True:
+                    self.myTurn = True
+                else:
+                    self.myTurn = False
         else:  # zaznaczenie co chcemy przesunąć
             if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.pusty:
                 self.lastclicked = ()
@@ -106,7 +116,7 @@ class Board(QMainWindow):
         if self.goodbuttons[(self.lastclicked[0] + int(wektorPrzeskoku[0] / 2)) * 8 + (
                 self.lastclicked[1] + int(wektorPrzeskoku[1] / 2) - 1)].getOwner() != self.opponent:
             return False
-        print("ruch z : ", self.lastclicked, " na ", tempint)
+
         self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(self.goodbuttons[
                                                                       self.lastclicked[0] * 8 + self.lastclicked[
                                                                           1] - 1].getKind())
@@ -215,12 +225,12 @@ class Board(QMainWindow):
                 if (i + j) % 2 == 1 and i >= 0 and i < 3:
                     button.setStyleSheet("background-image: url(assets/białyzwykły50.jpg)")
                     button.setKind(RodzajPionka.bialyzwykly)
-                    button.setOwner("host")
+                    button.setOwner("player")
                     self.goodbuttons.append(button)
                 elif (i + j) % 2 == 1 and i >= 5 and i < 9:
                     button.setStyleSheet("background-image: url(assets/czarnyzwykły50.jpg)")
                     button.setKind(RodzajPionka.czarnyzwykly)
-                    button.setOwner("player")
+                    button.setOwner("host")
                     self.goodbuttons.append(button)
                 elif (i + j) % 2 == 1:
                     button.setStyleSheet("background-color: gray")
@@ -264,18 +274,8 @@ class Board(QMainWindow):
             else:
                 self.goodbuttons[counter].setOwner(None)
             counter = counter + 1
-
-
-class threaded_cos(QThread):
-    def __init__(self):
-        QThread.__init__(self)
-        self.tobeshown = "penis"
-
-    def run(self):
-        while True:
-            print(self.tobeshown)
-            sleep(1)
-
+        self.updateboard(self.goodbuttons)
+        self.myTurn =True
 
 if __name__ == '__main__':
     import sys
@@ -283,6 +283,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
     board = Board("host", "player")
-    mythread = threaded_cos()
-    mythread.start()
     app.exec()
