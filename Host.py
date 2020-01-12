@@ -24,14 +24,15 @@ print("waiting for connection, server started!")
 
 def threaded_client(conn, b):  # obsługa klienta
     print("kogos zaakceptowało ale przed 1 wyslaniem")
-    conn.send(pickle.dumps(b))  # wysłanie board'a w ramach rozpoczęcia gry
+    toBeSent = b.encodeBoard()
+    conn.send(pickle.dumps(toBeSent))  # wysłanie board'a w ramach rozpoczęcia gry
     print("po 1 wyslaniu")
     while True:
         try:
             print("przed wczytaniem")
             data = pickle.loads(conn.recv(10000))
             print("po wczytaniu")
-            b = data
+            #odebranie / zmiana odebranych danych na te do boarda
 
             if not data:
                 print("disconnected")
@@ -52,6 +53,6 @@ conn, addr = s.accept()  # conn to jest ponoc to polaczenie cos ala socket w jav
 
 print("connected to: ", addr)
 app = QApplication(sys.argv)
-b = Board()
+b = Board("host","player")
 start_new_thread(threaded_client, (conn, b))
 app.exec()

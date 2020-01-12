@@ -12,7 +12,7 @@ n = Network()
 print("2")
 app = QApplication(sys.argv)
 print("3")
-board = Board()
+board = Board("player","Host")
 print("4")
 board = n.getP()
 print("5")
@@ -20,10 +20,7 @@ print("5")
 
 def threaded_cos(n,b):
     while True:
-        print("7")
-        b2 = n.send(b)
-        b = b2
-        sleep(0.5)
+        print("penis")
 
 start_new_thread(threaded_cos,(n,board))
 print("6")
