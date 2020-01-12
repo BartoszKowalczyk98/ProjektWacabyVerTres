@@ -11,6 +11,7 @@ from MyEnum import RodzajPionka
 class Board(QMainWindow):
     def __init__(self, playername, opponent):
         super(Board, self).__init__()
+        self.setWindowTitle(playername)
         self.isPieceSelected = False
         self.board = []
         self.tempbutton = None
@@ -206,6 +207,7 @@ class Board(QMainWindow):
                 elif i.getKind() == RodzajPionka.czarnydama:
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/czarnadama50.jpg)")
                 counter = counter + 1
+        self.update()
 
     def initUI(self):
         self.mainwidget = QWidget()

@@ -37,12 +37,15 @@ class myThread(QThread):
             data = pickle.loads(client.recv(10000))
             if not data:
                 print("disconnected")
+                sys.exit()
             else:
                 self.plansza.decodeBoard(data)
 
 
 
 print("6")
-app.exec()
+mythread = myThread(board)
+mythread.start()
+sys.exit(app.exec())
 
 

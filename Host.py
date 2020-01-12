@@ -46,6 +46,7 @@ class threaded_client(QThread):  # obsługa klienta
                     sleep(0.5)
                 if not data:
                     print("disconnected")
+                    sys.exit()
                     break
                 else:
                     print("przed wysłaniem")
@@ -65,5 +66,6 @@ conn, addr = s.accept()  # conn to jest ponoc to polaczenie cos ala socket w jav
 print("connected to: ", addr)
 app = QApplication(sys.argv)
 b = Board("host","player")
-threaded_client(conn,b)
+mythread = threaded_client(conn,b)
+mythread.start()
 app.exec()
