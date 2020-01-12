@@ -32,15 +32,11 @@ class threaded_client(QThread):  # obsługa klienta
         self.plansza = plansza
 
     def run(self):
-        print("kogos zaakceptowało ale przed 1 wyslaniem")
         toBeSent = self.plansza.encodeBoard()
-        self.conn.send(pickle.dumps(toBeSent))  # wysłanie board'a w ramach rozpoczęcia gry
-        print("po 1 wyslaniu")
+        self.conn.send(pickle.dumps(toBeSent))
         while True:
             try:
-                print("przed wczytaniem")
                 data = pickle.loads(conn.recv(10000))
-                print("po wczytaniu")
                 self.plansza.decodeBoard(data)
                 while self.plansza.myTurn:
                     sleep(0.5)
@@ -49,17 +45,14 @@ class threaded_client(QThread):  # obsługa klienta
                     sys.exit()
                     break
                 else:
-                    print("przed wysłaniem")
                     toBeSent = self.plansza.encodeBoard()
                     self.conn.sendall(pickle.dumps(toBeSent))
-                    print("po wysłaniu")
             except:
                 print("eror")
                 break
         print("lost connection")
         self.conn.close()
 
-print("przed akceptacja")
 pymsgbox.alert('Waiting for opponent to connect', 'Be patient...')
 conn, addr = s.accept()  # conn to jest ponoc to polaczenie cos ala socket w javie bo przez niego sie przesyla
 
