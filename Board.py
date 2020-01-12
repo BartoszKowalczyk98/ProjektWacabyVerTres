@@ -161,6 +161,12 @@ class Board(QMainWindow):
         self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setKind(RodzajPionka.pusty)
         self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setOwner(None)
         self.lastclicked = ()
+
+        if tempint[0] == 0 and self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.czarnyzwykly:
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(RodzajPionka.czarnydama)
+        elif tempint[0] == 7 and self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.bialyzwykly:
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(RodzajPionka.bialydama)
+
         self.updateboard(self.goodbuttons)
         return True
 
@@ -187,6 +193,12 @@ class Board(QMainWindow):
         self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setKind(RodzajPionka.pusty)
         self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setOwner(None)
         self.lastclicked = ()
+
+        if tempint[0] == 0 and self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.czarnyzwykly:
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(RodzajPionka.czarnydama)
+        elif tempint[0] == 7 and self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.bialyzwykly:
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(RodzajPionka.bialydama)
+
         self.updateboard(self.goodbuttons)
         return True
 
