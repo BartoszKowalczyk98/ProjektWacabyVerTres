@@ -3,9 +3,6 @@ import socket
 import sys
 from time import sleep
 
-import pymsgbox
-from _thread import start_new_thread
-
 from PyQt5.QtCore import QThread
 from PyQt5.QtWidgets import QApplication
 
@@ -53,7 +50,6 @@ class threaded_client(QThread):  # obsługa klienta
         print("lost connection")
         self.conn.close()
 
-pymsgbox.alert('Waiting for opponent to connect', 'Be patient...')
 conn, addr = s.accept()  # conn to jest ponoc to polaczenie cos ala socket w javie bo przez niego sie przesyla
 
 print("connected to: ", addr)
