@@ -1,9 +1,12 @@
 import pickle
 import socket
 import sys
+from time import sleep
+
 import pymsgbox
 from _thread import start_new_thread
 
+from PyQt5.QtCore import QThread
 from PyQt5.QtWidgets import QApplication
 
 from Board import Board
@@ -22,36 +25,40 @@ print("waiting for connection, server started!")
 
 
 
-def threaded_client(conn, b):  # obsługa klienta
-    print("kogos zaakceptowało ale przed 1 wyslaniem")
-    conn.send(pickle.dumps(b))  # wysłanie board'a w ramach rozpoczęcia gry
-    print("po 1 wyslaniu")
-    while True:
-        try:
-            print("przed wczytaniem")
-            data = pickle.loads(conn.recv(10000))
-            print("po wczytaniu")
-            b = data
+class threaded_client(QThread):  # obsługa klienta
+    def __init__(self,conn , plansza: Board):
+        QThread.__init__(self)
+        self.conn = conn
+        self.plansza = plansza
 
-            if not data:
-                print("disconnected")
+    def run(self):
+        toBeSent = self.plansza.encodeBoard()
+        self.conn.send(pickle.dumps(toBeSent))
+        while True:
+            try:
+                data = pickle.loads(conn.recv(10000))
+                self.plansza.decodeBoard(data)
+                while self.plansza.myTurn:
+                    sleep(0.5)
+                if not data:
+                    print("disconnected")
+                    sys.exit()
+                    break
+                else:
+                    toBeSent = self.plansza.encodeBoard()
+                    self.conn.sendall(pickle.dumps(toBeSent))
+            except:
+                print("eror")
                 break
-            else:
-                print("przed wysłaniem")
-                conn.sendall(pickle.dumps(b))
-                print("po wysłaniu")
-        except:
-            print("eror")
-            break
-    print("lost connection")
-    conn.close()
+        print("lost connection")
+        self.conn.close()
 
-print("przed akceptacja")
 pymsgbox.alert('Waiting for opponent to connect', 'Be patient...')
 conn, addr = s.accept()  # conn to jest ponoc to polaczenie cos ala socket w javie bo przez niego sie przesyla
 
 print("connected to: ", addr)
 app = QApplication(sys.argv)
-b = Board()
-start_new_thread(threaded_client, (conn, b))
+b = Board("host","player")
+mythread = threaded_client(conn,b)
+mythread.start()
 app.exec()

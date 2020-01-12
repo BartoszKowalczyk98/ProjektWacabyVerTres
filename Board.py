@@ -1,3 +1,6 @@
+from _thread import start_new_thread
+from time import sleep
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -6,14 +9,16 @@ from MyEnum import RodzajPionka
 
 
 class Board(QMainWindow):
-    def __init__(self):
+    def __init__(self, playername, opponent):
         super(Board, self).__init__()
+        self.setWindowTitle(playername)
         self.isPieceSelected = False
         self.board = []
         self.tempbutton = None
         self.lastclicked = ()
-        self.playername = 'Gracz1'
-        self.opponent = 'Gracz2'
+        self.playername = playername
+        self.myTurn = True
+        self.opponent = opponent
         self.status = self.statusBar()
         self.initUI()
 
@@ -25,6 +30,9 @@ class Board(QMainWindow):
             self.grupy[i].setExclusive(True)
 
     def buttonpressed(self):
+        if not self.myTurn:
+            self.uncheckall()
+            return
         for i in range(0, 8):
             self.tempbutton = self.grupy[i].checkedButton()
             tempint = (i, self.grupy[i].checkedId())
@@ -34,6 +42,7 @@ class Board(QMainWindow):
         self.uncheckall()
         self.checkMove(tempint)
 
+
     def isBeatingPossible(self, user):
         self.status.showMessage('Jest możliwość bicia')
         anythingToBeat = False
@@ -41,22 +50,26 @@ class Board(QMainWindow):
             for j in range(0, 8):
                 if self.goodbuttons[i * 8 + j].getOwner() == user:
                     if i - 2 >= 0 and j - 2 >= 0 and self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() != user and \
-                            self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[(i - 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
-                        self.tempbutton = self.goodbuttons[(i -1) * 8 + j - 1]
+                            self.goodbuttons[(i - 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[
+                        (i - 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
+                        self.tempbutton = self.goodbuttons[(i - 1) * 8 + j - 1]
                         self.changeColor(2)
                         anythingToBeat = True
                     elif i - 2 >= 0 and j + 2 <= 7 and self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() != user and \
-                            self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[(i - 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i - 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[
+                        (i - 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
                         self.tempbutton = self.goodbuttons[(i - 1) * 8 + j + 1]
                         self.changeColor(2)
                         anythingToBeat = True
                     elif i + 2 <= 7 and j - 2 >= 0 and self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() != user and \
-                            self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[(i + 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i + 1) * 8 + (j - 1)].getOwner() is not None and self.goodbuttons[
+                        (i + 2) * 8 + j - 2].getKind() == RodzajPionka.pusty:
                         self.tempbutton = self.goodbuttons[(i + 1) * 8 + j - 1]
                         self.changeColor(2)
                         anythingToBeat = True
                     elif i + 2 <= 7 and j + 2 <= 7 and self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() != user and \
-                            self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[(i + 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
+                            self.goodbuttons[(i + 1) * 8 + (j + 1)].getOwner() is not None and self.goodbuttons[
+                        (i + 2) * 8 + j + 2].getKind() == RodzajPionka.pusty:
                         self.tempbutton = self.goodbuttons[(i + 1) * 8 + j + 1]
                         self.changeColor(2)
                         anythingToBeat = True
@@ -68,17 +81,22 @@ class Board(QMainWindow):
         doIHaveToBeat = self.isBeatingPossible(self.playername)  # sprawdzanie czy jest bicie
         if self.lastclicked == tempint:  # odklikanie
 
-            self.tempbutton = self.goodbuttons[self.lastclicked[0]*8 + self.lastclicked[1]-1]
+            self.tempbutton = self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1]
             self.changeColor(0)
             self.lastclicked = ()
         elif self.lastclicked != ():  # ruch
             if doIHaveToBeat:
-                completed = self.beatingMove(tempint, self.playername, self.opponent)
+                completed = self.beatingMove(tempint)
             else:
                 completed = self.noBeatingMove(tempint)
             if not completed:
                 self.status.showMessage('Bledny ruch')
                 return
+            else:
+                if doIHaveToBeat== True:
+                    self.myTurn = True
+                else:
+                    self.myTurn = False
         else:  # zaznaczenie co chcemy przesunąć
             if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.pusty:
                 self.lastclicked = ()
@@ -90,16 +108,16 @@ class Board(QMainWindow):
                 self.changeColor(1)
                 self.lastclicked = tempint
 
-    def beatingMove(self, tempint, owner, opponent):
+    def beatingMove(self, tempint):
         wektorPrzeskoku = (tempint[0] - self.lastclicked[0], tempint[1] - self.lastclicked[1])
         if abs(wektorPrzeskoku[1]) != 2 or abs(wektorPrzeskoku[0]) != 2:
             return False
         if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() != RodzajPionka.pusty:
             return False
         if self.goodbuttons[(self.lastclicked[0] + int(wektorPrzeskoku[0] / 2)) * 8 + (
-                self.lastclicked[1] + int(wektorPrzeskoku[1] / 2) - 1)].getOwner() != opponent:
+                self.lastclicked[1] + int(wektorPrzeskoku[1] / 2) - 1)].getOwner() != self.opponent:
             return False
-        print("ruch z : ", self.lastclicked, " na ", tempint)
+
         self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(self.goodbuttons[
                                                                       self.lastclicked[0] * 8 + self.lastclicked[
                                                                           1] - 1].getKind())
@@ -189,6 +207,7 @@ class Board(QMainWindow):
                 elif i.getKind() == RodzajPionka.czarnydama:
                     self.goodbuttons[counter].setStyleSheet("background-image: url(assets/czarnadama50.jpg)")
                 counter = counter + 1
+        self.update()
 
     def initUI(self):
         self.mainwidget = QWidget()
@@ -208,12 +227,12 @@ class Board(QMainWindow):
                 if (i + j) % 2 == 1 and i >= 0 and i < 3:
                     button.setStyleSheet("background-image: url(assets/białyzwykły50.jpg)")
                     button.setKind(RodzajPionka.bialyzwykly)
-                    button.setOwner("Gracz1")
+                    button.setOwner("player")
                     self.goodbuttons.append(button)
                 elif (i + j) % 2 == 1 and i >= 5 and i < 9:
                     button.setStyleSheet("background-image: url(assets/czarnyzwykły50.jpg)")
                     button.setKind(RodzajPionka.czarnyzwykly)
-                    button.setOwner("Gracz2")
+                    button.setOwner("host")
                     self.goodbuttons.append(button)
                 elif (i + j) % 2 == 1:
                     button.setStyleSheet("background-color: gray")
@@ -240,11 +259,30 @@ class Board(QMainWindow):
         self.grupy[6].buttonClicked.connect(self.buttonpressed)
         self.grupy[7].buttonClicked.connect(self.buttonpressed)
 
+    def encodeBoard(self):
+        toBeSent = []
+        for element in self.goodbuttons:
+            toBeSent.append(element.getKind())
+        return toBeSent
+
+    def decodeBoard(self, received):
+        counter = 0
+        for element in received:
+            self.goodbuttons[counter].setKind(element)
+            if element == RodzajPionka.bialyzwykly or element == RodzajPionka.bialydama:
+                self.goodbuttons[counter].setOwner("host")
+            elif element == RodzajPionka.czarnyzwykly or element == RodzajPionka.czarnydama:
+                self.goodbuttons[counter].setOwner("player")
+            else:
+                self.goodbuttons[counter].setOwner(None)
+            counter = counter + 1
+        self.updateboard(self.goodbuttons)
+        self.myTurn =True
 
 if __name__ == '__main__':
     import sys
 
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
-    board = Board()
-    sys.exit(app.exec())
+    board = Board("host", "player")
+    app.exec()
