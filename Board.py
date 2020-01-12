@@ -184,7 +184,8 @@ class Board(QMainWindow):
                 return False
         if self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() != RodzajPionka.pusty:
             return False
-        print("ruch z : ", self.lastclicked, " na ", tempint)
+        self.previousMoves= self.previousMoves +"\n" + self.lastclicked.__str__() +"->"+tempint.__str__()
+        self.historyOfMoves.setText(self.previousMoves)
         self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(self.goodbuttons[
                                                                       self.lastclicked[0] * 8 + self.lastclicked[
                                                                           1] - 1].getKind())
@@ -288,6 +289,36 @@ class Board(QMainWindow):
                 self.grupy[i].addButton(button, j + 1)
                 self.grid.addWidget(button, i, j)
 
+        #bartkowe kombinowanie z dockwidgetem
+        self.rightWidget = QWidget()
+        dockwidget = QDockWidget("Dockable",self)
+        vbox = QVBoxLayout()
+        self.previousMoves =""
+        self.historyOfMoves = QLabel()
+        self.historyOfMoves.setFixedSize(190,400)
+        self.historyOfMoves.setText(self.previousMoves)
+        self.turnDot = QLabel()
+        if not self.myTurn:
+            pixmap = QPixmap('assets/czerwono.png')
+            pixmap = pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.turnDot.setPixmap(pixmap)
+        else:
+            pixmap = QPixmap('assets/zielono.png')
+            pixmap = pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.turnDot.setPixmap(pixmap)
+
+        #self.turnDot.setText(" ")
+        self.historyOfMoves.setStyleSheet("background-color: white")
+        vbox.addWidget(self.historyOfMoves)
+        vbox.addWidget(self.turnDot)
+        self.rightWidget.setLayout(vbox)
+        dockwidget.setWidget(self.rightWidget)
+        dockwidget.setFloating(False)
+        self.addDockWidget(Qt.RightDockWidgetArea,dockwidget)
+        self.setFixedSize(800,620)
+
+
+
         self.setCentralWidget(self.mainwidget)
         self.show()
 
@@ -310,10 +341,18 @@ class Board(QMainWindow):
         toBeSent = []
         for element in self.goodbuttons:
             toBeSent.append(element.getKind())
+        self.status.showMessage('Tura przeciwnika')
+        pixmap = QPixmap('assets/czerwono.png')
+        pixmap = pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.turnDot.setPixmap(pixmap)
         return toBeSent
 
     def decodeBoard(self, received):
         counter = 0
+        pixmap = QPixmap('assets/zielono.png')
+        pixmap = pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.turnDot.setPixmap(pixmap)
+        self.status.showMessage('Moja tura')
         for element in received:
             self.goodbuttons[counter].setKind(element)
             if element == RodzajPionka.bialyzwykly or element == RodzajPionka.bialydama:
@@ -328,8 +367,9 @@ class Board(QMainWindow):
 
 if __name__ == '__main__':
     import sys
-
+    cos = (13,13)
+    print(cos.__str__())
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
-    board = Board("host", "player")
+    board = Board("player", "host")
     app.exec()
