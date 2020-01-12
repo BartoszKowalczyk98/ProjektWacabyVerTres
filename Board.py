@@ -20,6 +20,7 @@ class Board(QMainWindow):
         self.myTurn = False
         self.opponent = opponent
         self.status = self.statusBar()
+        self.isEnding = False
         self.initUI()
 
     def uncheckall(self):
@@ -108,6 +109,34 @@ class Board(QMainWindow):
                 self.changeColor(1)
                 self.lastclicked = tempint
 
+        if self.theEnd():
+            for i in range(64):
+                self.goodbuttons[i].setEnabled(False)
+            if self.winner == 0:
+                self.endingLabel.setText("Wygral gracz czarny!")
+            elif self.winner == 1:
+                self.endingLabel.setText("Wygral gracz bialy!")
+            self.setCentralWidget(self.endingWidget)
+            self.mainwidget.hide()
+            self.endingWidget.show()
+
+    def theEnd(self):
+        bialych = 0
+        czarnych = 0
+        for i in range(0,8):
+            for j in range(0,8):
+                if self.goodbuttons[i*8 + j].getKind() == RodzajPionka.czarnydama or self.goodbuttons[i*8 + j].getKind() == RodzajPionka.czarnyzwykly:
+                    czarnych = czarnych + 1
+                elif self.goodbuttons[i*8 + j].getKind() == RodzajPionka.bialydama or self.goodbuttons[i*8 + j].getKind() == RodzajPionka.bialyzwykly:
+                    bialych = bialych + 1
+        if bialych == 0:
+            self.winner = 0
+            return True
+        if czarnych == 0:
+            self.winner = 1
+            return True
+        return False
+
     def beatingMove(self, tempint):
         wektorPrzeskoku = (tempint[0] - self.lastclicked[0], tempint[1] - self.lastclicked[1])
         if abs(wektorPrzeskoku[1]) != 2 or abs(wektorPrzeskoku[0]) != 2:
@@ -132,6 +161,12 @@ class Board(QMainWindow):
         self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setKind(RodzajPionka.pusty)
         self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setOwner(None)
         self.lastclicked = ()
+
+        if tempint[0] == 0 and self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.czarnyzwykly:
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(RodzajPionka.czarnydama)
+        elif tempint[0] == 7 and self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.bialyzwykly:
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(RodzajPionka.bialydama)
+
         self.updateboard(self.goodbuttons)
         return True
 
@@ -158,6 +193,12 @@ class Board(QMainWindow):
         self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setKind(RodzajPionka.pusty)
         self.goodbuttons[self.lastclicked[0] * 8 + self.lastclicked[1] - 1].setOwner(None)
         self.lastclicked = ()
+
+        if tempint[0] == 0 and self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.czarnyzwykly:
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(RodzajPionka.czarnydama)
+        elif tempint[0] == 7 and self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].getKind() == RodzajPionka.bialyzwykly:
+            self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(RodzajPionka.bialydama)
+
         self.updateboard(self.goodbuttons)
         return True
 
@@ -249,6 +290,12 @@ class Board(QMainWindow):
 
         self.setCentralWidget(self.mainwidget)
         self.show()
+
+        self.endingWidget = QWidget()
+        hbox = QHBoxLayout()
+        self.endingLabel = QLabel()
+        hbox.addWidget(self.endingLabel)
+        self.endingWidget.setLayout(hbox)
 
         self.grupy[0].buttonClicked.connect(self.buttonpressed)
         self.grupy[1].buttonClicked.connect(self.buttonpressed)
