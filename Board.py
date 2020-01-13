@@ -11,7 +11,11 @@ from MyEnum import RodzajPionka
 class Board(QMainWindow):
     def __init__(self, playername, opponent):
         super(Board, self).__init__()
-        self.setWindowTitle(playername)
+        if (playername == "host"):
+            self.setWindowTitle(playername + " - czarny")
+        else:
+            self.setWindowTitle(playername + " - bialy")
+
         self.board = []
         self.tempbutton = None
         self.lastclicked = ()
