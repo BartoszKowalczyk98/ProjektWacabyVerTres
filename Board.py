@@ -15,7 +15,7 @@ class Board(QMainWindow):
             self.setWindowTitle(playername + " - czarny")
         else:
             self.setWindowTitle(playername + " - bialy")
-
+        self.surrenderBool = False
         self.board = []
         self.tempbutton = None
         self.lastclicked = ()
@@ -111,7 +111,7 @@ class Board(QMainWindow):
                 self.changeColor(1)
                 self.lastclicked = tempint
 
-        if self.theEnd():
+        if self.theEnd() or self.surrenderBool:
             for i in range(64):
                 self.goodbuttons[i].setEnabled(False)
             if self.winner == 0:
@@ -133,8 +133,12 @@ class Board(QMainWindow):
                     bialych = bialych + 1
         if bialych == 0:
             self.winner = 0
+            if self.playername == "player":
+                self.surrenderBool = True
             return True
         if czarnych == 0:
+            if self.playername == "host":
+                self.surrenderBool=True
             self.winner = 1
             return True
         return False
@@ -262,6 +266,7 @@ class Board(QMainWindow):
             self.endingLabel.setText("Poddales sie!\nWygral gracz biały!")
         elif self.playername == "player":
             self.endingLabel.setText("Poddales sie!\nWygral gracz czarny!")
+        self.surrenderBool =True
         self.setCentralWidget(self.endingWidget)
         self.mainwidget.hide()
         self.endingWidget.show()
@@ -370,6 +375,23 @@ class Board(QMainWindow):
         pixmap = pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.turnDot.setPixmap(pixmap)
         self.status.showMessage('Moja tura')
+        if type(received) == bool:
+            if received == True:
+                if self.playername == "host":
+                    self.winner = 0
+                else:
+                    self.winner = 1
+                for i in range(64):
+                    self.goodbuttons[i].setEnabled(False)
+                if self.winner == 0:
+                    self.endingLabel.setText("Wygral gracz czarny!")
+                elif self.winner == 1:
+                    self.endingLabel.setText("Wygral gracz bialy!")
+                self.setCentralWidget(self.endingWidget)
+                self.mainwidget.hide()
+                self.endingWidget.show()
+                return
+
         for element in received:
             self.goodbuttons[counter].setKind(element)
             if element == RodzajPionka.bialyzwykly or element == RodzajPionka.bialydama:

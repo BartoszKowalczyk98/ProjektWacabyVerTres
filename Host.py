@@ -21,9 +21,8 @@ s.listen()
 print("waiting for connection, server started!")
 
 
-
 class threaded_client(QThread):  # obsługa klienta
-    def __init__(self,conn , plansza: Board):
+    def __init__(self, conn, plansza: Board):
         QThread.__init__(self)
         self.conn = conn
         self.plansza = plansza
@@ -32,29 +31,30 @@ class threaded_client(QThread):  # obsługa klienta
         toBeSent = self.plansza.encodeBoard()
         self.conn.send(pickle.dumps(toBeSent))
         while True:
-            try:
-                data = pickle.loads(conn.recv(10000))
-                self.plansza.decodeBoard(data)
-                while self.plansza.myTurn:
-                    sleep(0.5)
-                if not data:
-                    print("disconnected")
-                    sys.exit()
-                    break
-                else:
-                    toBeSent = self.plansza.encodeBoard()
-                    self.conn.sendall(pickle.dumps(toBeSent))
-            except:
-                print("eror")
+            data = pickle.loads(conn.recv(10000))
+            self.plansza.decodeBoard(data)
+            while self.plansza.myTurn:
+                if self.plansza.surrenderBool:
+                    self.conn.sendall(pickle.dumps(self.plansza.surrenderBool))
+                    return
+                sleep(0.5)
+            if not data:
+                print("disconnected")
+                sys.exit()
                 break
+            else:
+                toBeSent = self.plansza.encodeBoard()
+                self.conn.sendall(pickle.dumps(toBeSent))
+
         print("lost connection")
         self.conn.close()
+
 
 conn, addr = s.accept()  # conn to jest ponoc to polaczenie cos ala socket w javie bo przez niego sie przesyla
 
 print("connected to: ", addr)
 app = QApplication(sys.argv)
-b = Board("host","player")
-mythread = threaded_client(conn,b)
+b = Board("host", "player")
+mythread = threaded_client(conn, b)
 mythread.start()
 app.exec()

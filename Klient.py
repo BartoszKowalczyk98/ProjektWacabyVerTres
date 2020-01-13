@@ -25,6 +25,9 @@ class myThread(QThread):
         self.plansza.decodeBoard(data)
         while True:
             while self.plansza.myTurn:
+                if self.plansza.surrenderBool:
+                    client.sendall(pickle.dumps(self.plansza.surrenderBool))
+                    return
                 sleep(0.5)
             tobesent = self.plansza.encodeBoard()
             client.sendall(pickle.dumps(tobesent))
