@@ -253,9 +253,9 @@ class Board(QMainWindow):
         for i in range(64):
             self.goodbuttons[i].setEnabled(False)
         if self.playername == "host":
-            self.endingLabel.setText("Wygral gracz biały!")
+            self.endingLabel.setText("Poddales sie!\nWygral gracz biały!")
         elif self.playername == "player":
-            self.endingLabel.setText("Wygral gracz czarny!")
+            self.endingLabel.setText("Poddales sie!\nWygral gracz czarny!")
         self.setCentralWidget(self.endingWidget)
         self.mainwidget.hide()
         self.endingWidget.show()
