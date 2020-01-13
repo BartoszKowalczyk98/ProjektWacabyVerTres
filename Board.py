@@ -149,6 +149,8 @@ class Board(QMainWindow):
                 self.lastclicked[1] + int(wektorPrzeskoku[1] / 2) - 1)].getOwner() != self.opponent:
             return False
 
+        self.previousMoves = self.previousMoves + "\n" + self.lastclicked.__str__() + "->" + tempint.__str__() +" zbito: "+ (self.lastclicked[0]+int(wektorPrzeskoku[0]/2),int(self.lastclicked[1]+int(wektorPrzeskoku[1]/2))).__str__()
+        self.historyOfMoves.setText(self.previousMoves)
         self.goodbuttons[tempint[0] * 8 + tempint[1] - 1].setKind(self.goodbuttons[
                                                                       self.lastclicked[0] * 8 + self.lastclicked[
                                                                           1] - 1].getKind())
