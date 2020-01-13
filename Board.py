@@ -12,7 +12,6 @@ class Board(QMainWindow):
     def __init__(self, playername, opponent):
         super(Board, self).__init__()
         self.setWindowTitle(playername)
-        self.isPieceSelected = False
         self.board = []
         self.tempbutton = None
         self.lastclicked = ()
@@ -20,7 +19,6 @@ class Board(QMainWindow):
         self.myTurn = False
         self.opponent = opponent
         self.status = self.statusBar()
-        self.isEnding = False
         self.initUI()
 
     def uncheckall(self):
@@ -251,6 +249,17 @@ class Board(QMainWindow):
                 counter = counter + 1
         self.update()
 
+    def surrender(self):
+        for i in range(64):
+            self.goodbuttons[i].setEnabled(False)
+        if self.playername == "host":
+            self.endingLabel.setText("Poddales sie!\nWygral gracz biały!")
+        elif self.playername == "player":
+            self.endingLabel.setText("Poddales sie!\nWygral gracz czarny!")
+        self.setCentralWidget(self.endingWidget)
+        self.mainwidget.hide()
+        self.endingWidget.show()
+
     def initUI(self):
         self.mainwidget = QWidget()
         self.mainwidget.setFixedSize(600, 600)
@@ -307,17 +316,18 @@ class Board(QMainWindow):
             pixmap = pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.turnDot.setPixmap(pixmap)
 
+
         #self.turnDot.setText(" ")
         self.historyOfMoves.setStyleSheet("background-color: white")
         vbox.addWidget(self.historyOfMoves)
+        self.surrenderbutton = QPushButton("Poddaj sie")
+        vbox.addWidget(self.surrenderbutton)
         vbox.addWidget(self.turnDot)
         self.rightWidget.setLayout(vbox)
         dockwidget.setWidget(self.rightWidget)
         dockwidget.setFloating(False)
         self.addDockWidget(Qt.RightDockWidgetArea,dockwidget)
         self.setFixedSize(800,620)
-
-
 
         self.setCentralWidget(self.mainwidget)
         self.show()
@@ -336,6 +346,7 @@ class Board(QMainWindow):
         self.grupy[5].buttonClicked.connect(self.buttonpressed)
         self.grupy[6].buttonClicked.connect(self.buttonpressed)
         self.grupy[7].buttonClicked.connect(self.buttonpressed)
+        self.surrenderbutton.clicked.connect(self.surrender)
 
     def encodeBoard(self):
         toBeSent = []
